@@ -17,3 +17,7 @@ export const usersTable = pgTable("users", {
   created_at: timestamp({ withTimezone: true }).defaultNow().notNull(),
   updated_at: timestamp().$onUpdate(() => new Date()),
 });
+
+export type User = typeof usersTable.$inferSelect;
+export type NewUser = typeof usersTable.$inferInsert;
+export type PublicUser = Omit<User, "password_hash">;
