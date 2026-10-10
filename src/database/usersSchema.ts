@@ -1,3 +1,4 @@
+import { sql } from "drizzle-orm";
 import {
   timestamp,
   date,
@@ -5,7 +6,10 @@ import {
   varchar,
   pgTable,
   uuid,
+  pgEnum,
 } from "drizzle-orm/pg-core";
+
+export const genderEnum = pgEnum("gender", ["male", "female"]);
 
 export const usersTable = pgTable("users", {
   id: uuid().primaryKey().defaultRandom(),
@@ -14,6 +18,7 @@ export const usersTable = pgTable("users", {
   email: varchar({ length: 255 }).unique().notNull(),
   password_hash: text().notNull(),
   date_of_birth: date(),
+  gender: genderEnum(),
   created_at: timestamp({ withTimezone: true }).defaultNow().notNull(),
   updated_at: timestamp().$onUpdate(() => new Date()),
 });
