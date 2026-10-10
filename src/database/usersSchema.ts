@@ -11,7 +11,7 @@ import {
 
 export const genderEnum = pgEnum("gender", ["male", "female"]);
 
-export const usersTable = pgTable("users", {
+export const users = pgTable("users", {
   id: uuid().primaryKey().defaultRandom(),
   first_name: varchar({ length: 120 }).notNull(),
   last_name: varchar({ length: 120 }).notNull(),
@@ -23,6 +23,6 @@ export const usersTable = pgTable("users", {
   updated_at: timestamp().$onUpdate(() => new Date()),
 });
 
-export type User = typeof usersTable.$inferSelect;
-export type NewUser = typeof usersTable.$inferInsert;
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
 export type PublicUser = Omit<User, "password_hash">;

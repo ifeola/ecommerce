@@ -4,6 +4,7 @@ import type {
   ErrorRequestHandler,
   NextFunction,
 } from "express";
+import { CustomError } from "../utils/customErrors.js";
 
 const errorMiddleware: ErrorRequestHandler = (
   err,
@@ -11,13 +12,9 @@ const errorMiddleware: ErrorRequestHandler = (
   res: Response,
   next: NextFunction,
 ) => {
-  if (err instanceof Error) {
-    return res
-      .status(err.status)
-      .json({ success: false, message: err.message });
-  }
+  const statusCode = err instanceof CustomError ? err.statusCode : 500;
 
-  res.status(500).json({
+  res.status(statusCode).json({
     success: false,
     message: err.message || "Internal Server Error",
   });
