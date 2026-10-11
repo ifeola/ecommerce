@@ -1,1 +1,1 @@
-export * from "./usersSchema.ts";
+export * from "../controllers/users/usersSchema.ts";
