@@ -7,7 +7,7 @@ import {
   ConflictError,
   NotFoundError,
 } from "../../utils/customErrors.ts";
-import db from "../../database/index.ts";
+import { db } from "../../database/index.ts";
 import bcrypt from "bcrypt";
 import { eq } from "drizzle-orm";
 import { getResponse, pagination, postResponse } from "../../utils/response.ts";
@@ -88,6 +88,7 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
       password_hash,
       gender: data.gender,
       date_of_birth: data.date_of_birth,
+      role: "user",
     })
     .returning({
       id: users.id,
@@ -96,6 +97,7 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
       email: users.email,
       date_of_birth: users.date_of_birth,
       gender: users.gender,
+      role: users.role,
       created_at: users.created_at,
       updated_at: users.updated_at,
     });

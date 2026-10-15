@@ -9,6 +9,7 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const genderEnum = pgEnum("gender", ["male", "female"]);
+export const roleEnum = pgEnum("role", ["user", "admin"]);
 
 export const users = pgTable("users", {
   id: uuid().primaryKey().defaultRandom(),
@@ -18,6 +19,7 @@ export const users = pgTable("users", {
   password_hash: text().notNull(),
   date_of_birth: date(),
   gender: genderEnum(),
+  role: roleEnum(),
   created_at: timestamp({ withTimezone: true }).defaultNow().notNull(),
   updated_at: timestamp().$onUpdate(() => new Date()),
 });
