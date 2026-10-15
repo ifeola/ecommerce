@@ -1,26 +1,60 @@
-import session from "express-session";
-import connectPgSimple from "connect-pg-simple";
-import { pool } from "../../database/index.ts";
+import type { NextFunction, Response, Request } from "express";
+import bcrypt from "bcrypt";
+import { postResponse } from "../../utils/response.ts";
+import { LoginSchema } from "../../middlewares/validator.ts";
+import { BadRequestError } from "../../utils/customErrors.ts";
+import { flattenError } from "zod/v4/core";
+import { db } from "../../database/index.ts";
+import { users } from "../users/usersSchema.ts";
+import { eq } from "drizzle-orm";
 
-const PgSession = connectPgSimple(session);
-const isProd = process.env.NODE_ENV === "production";
+const login = async (req: Request, res: Response, next: NextFunction) => {
+  const data = LoginSchema.safeParse(req.body);
+  if (!data.success) {
+    return next(
+      new BadRequestError(JSON.stringify(flattenError(data.error).fieldErrors)),
+    );
+  }
 
-const authenticate = session({
-  store: new PgSession({
-    pool: pool,
-    tableName: "user_sessions",
-    createTableIfMissing: true,
-  }),
-  name: "sid",
-  secret: process.env.SESSION_SECRET!,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: "lax",
-    maxAge: 1000 * 60 * 60,
-  },
-});
+  const { email, password } = data.data;
 
-export default authenticate;
+  // Check if email exists in the database
+  const [emailExists] = await db
+    .select({
+      id: users.id,
+      role: users.role,
+      password: users.password_hash,
+    })
+    .from(users)
+    .where(eq(users.email, email));
+
+  const isPasswordOk = await bcrypt.compare(
+    password,
+    emailExists?.password as string,
+  );
+
+  if (!emailExists || !isPasswordOk) {
+    return next(new BadRequestError("Invalid email or password"));
+  }
+
+  req.session.regenerate((err) => {
+    if (err) return next(err);
+
+    req.session.userId = emailExists.id;
+    req.session.role = emailExists.role;
+
+    req.session.save((err) => {
+      if (err) return next(err);
+
+      return res.status(200).json({
+        message: "User successfully logged in",
+        data: {
+          userId: req.session.userId,
+          role: req.session.role,
+        },
+      });
+    });
+  });
+};
+
+export { login };

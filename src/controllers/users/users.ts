@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { users } from "../../database/schema.ts";
 import type { NextFunction, Request, Response } from "express";
-import UserSchema from "../../middlewares/validator.ts";
+import { UserSchema } from "../../middlewares/validator.ts";
 import {
   BadRequestError,
   ConflictError,

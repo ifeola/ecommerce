@@ -22,6 +22,12 @@ const UserSchema = z.object({
     .optional(),
 });
 
-export type User = z.infer<typeof UserSchema>;
+const LoginSchema = z.object({
+  email: z.email(),
+  password: z.string().min(8).max(72),
+});
 
-export default UserSchema;
+export type User = z.infer<typeof UserSchema>;
+export type Login = z.infer<typeof LoginSchema>;
+
+export { UserSchema, LoginSchema };

@@ -6,7 +6,7 @@ import helmet from "helmet";
 import morgan from "morgan";
 import type { Express } from "express";
 import type { CorsOptions } from "cors";
-import authenticate from "./controllers/auth/auth.ts";
+import authenticate from "./controllers/auth/session.ts";
 
 const PORT = process.env.PORT ?? 4000;
 const app: Express = express();
