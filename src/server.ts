@@ -7,6 +7,7 @@ import morgan from "morgan";
 import type { Express } from "express";
 import type { CorsOptions } from "cors";
 import authenticate from "./controllers/auth/session.ts";
+import errorMiddleware from "./middlewares/errorMiddleware.ts";
 
 const PORT = process.env.PORT ?? 4000;
 const app: Express = express();
@@ -28,9 +29,10 @@ app.use(cors(corsOptions));
 app.use(cookieParse());
 app.use(express.json());
 app.use(helmet());
-app.use(morgan("dev"));
+// app.use(morgan("dev"));
 app.use(morgan(":method :url :status :response-time ms"));
 app.use(authenticate);
+app.use(errorMiddleware);
 app.use("/api/v1", router);
 
 app.listen(PORT, () => {

@@ -19,9 +19,9 @@ export const users = pgTable("users", {
   password_hash: text().notNull(),
   date_of_birth: date(),
   gender: genderEnum(),
-  role: roleEnum(),
+  role: roleEnum().notNull().default("user"),
   created_at: timestamp({ withTimezone: true }).defaultNow().notNull(),
-  updated_at: timestamp().$onUpdate(() => new Date()),
+  updated_at: timestamp({ withTimezone: true }).$onUpdate(() => new Date()),
 });
 
 export type User = typeof users.$inferSelect;

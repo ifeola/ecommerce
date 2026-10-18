@@ -20,8 +20,8 @@ export interface PaginatedResult<T> {
 }
 
 const pagination = (req: Request): QueryParams => {
-  const limit = parseInt(req.params?.limit as string) || 5;
-  const page = Math.max(1, parseInt(req.params?.page as string) || 1);
+  const limit = parseInt(req.query?.limit as string) || 5;
+  const page = Math.max(1, parseInt(req.query?.page as string) || 1);
   const offset = (page - 1) * limit;
 
   return {

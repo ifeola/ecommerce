@@ -9,22 +9,15 @@ import {
 } from "../../utils/customErrors.ts";
 import { db } from "../../database/index.ts";
 import bcrypt from "bcrypt";
-import { eq } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { getResponse, pagination, postResponse } from "../../utils/response.ts";
 
 const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
   const { page, limit, offset } = pagination(req);
 
-  const totalRecords = await db
+  const [totalRecords] = await db
     .select({
-      id: users.id,
-      first_name: users.first_name,
-      last_name: users.last_name,
-      email: users.email,
-      date_of_birth: users.date_of_birth,
-      gender: users.gender,
-      created_at: users.created_at,
-      updated_at: users.updated_at,
+      count: count(),
     })
     .from(users);
 
@@ -43,13 +36,13 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     .offset(offset)
     .limit(limit);
 
-  if (data.length === 0) {
+  if (totalRecords?.count === 0) {
     return next(new NotFoundError("No users found"));
   }
 
   return res
     .status(200)
-    .json(getResponse(limit, page, totalRecords.length, data));
+    .json(getResponse(limit, page, totalRecords?.count as number, data));
 };
 
 const addUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -65,14 +58,17 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
   const data = result.data;
 
   // Find if user with email already exits
-  const [userExists] = await db
-    .select({ email: users.email })
-    .from(users)
-    .where(eq(users.email, data.email))
-    .limit(1);
-
-  if (userExists) {
-    return next(new ConflictError("Email already in use"));
+  try {
+    const [userExists] = await db
+      .select({ email: users.email })
+      .from(users)
+      .where(eq(users.email, data.email))
+      .limit(1);
+  } catch (e: any) {
+    if (e.code === "23505") {
+      return next(new ConflictError("Email already in use"));
+    }
+    throw e;
   }
 
   const salt = await bcrypt.genSalt(10);

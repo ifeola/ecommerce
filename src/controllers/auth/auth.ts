@@ -28,14 +28,16 @@ const login = async (req: Request, res: Response, next: NextFunction) => {
     .from(users)
     .where(eq(users.email, email));
 
+  if (!emailExists)
+    return next(new BadRequestError("Invalid email or password"));
+
   const isPasswordOk = await bcrypt.compare(
     password,
     emailExists?.password as string,
   );
 
-  if (!emailExists || !isPasswordOk) {
+  if (!isPasswordOk)
     return next(new BadRequestError("Invalid email or password"));
-  }
 
   req.session.regenerate((err) => {
     if (err) return next(err);
