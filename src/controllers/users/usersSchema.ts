@@ -13,8 +13,8 @@ export const roleEnum = pgEnum("role", ["user", "admin"]);
 
 export const users = pgTable("users", {
   id: uuid().primaryKey().defaultRandom(),
-  first_name: varchar({ length: 120 }).notNull(),
-  last_name: varchar({ length: 120 }).notNull(),
+  first_name: varchar({ length: 30 }).notNull(),
+  last_name: varchar({ length: 30 }).notNull(),
   email: varchar({ length: 255 }).unique().notNull(),
   password_hash: text().notNull(),
   date_of_birth: date(),

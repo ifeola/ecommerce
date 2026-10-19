@@ -73,7 +73,7 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
 
   const salt = await bcrypt.genSalt(10);
   const password_hash = await bcrypt.hash(data.password, salt);
-  const email = data.email.trim().toLowerCase();
+  const email = data.email;
 
   const [newUser] = await db
     .insert(users)

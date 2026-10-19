@@ -3,9 +3,9 @@ import * as z from "zod";
 export const GENDERS = ["male", "female"] as const;
 
 const UserSchema = z.object({
-  first_name: z.string("First name is required.").min(2).toLowerCase(),
-  last_name: z.string("Last name is required.").min(2).toLowerCase(),
-  email: z.email("Enter a valid email address").toLowerCase(),
+  first_name: z.string("First name is required.").min(2).max(30).toLowerCase(),
+  last_name: z.string("Last name is required.").min(2).max(30).toLowerCase(),
+  email: z.email("Enter a valid email address").toLowerCase().trim(),
   gender: z.enum(GENDERS, "Select a valid gender").optional(),
   phone: z
     .string()
