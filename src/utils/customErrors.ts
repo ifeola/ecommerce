@@ -14,13 +14,13 @@ class BadRequestError extends CustomError {
   }
 }
 
-class UnauthorizedError extends CustomError {
-  constructor(message = "Unauthorized") {
+class AuthenticationError extends CustomError {
+  constructor(message = "Unauthenticated") {
     super(401, message);
   }
 }
 
-class UnauthenticatedError extends CustomError {
+class AuthorizationError extends CustomError {
   constructor(message = "Forbidden") {
     super(403, message);
   }
@@ -48,8 +48,8 @@ export {
   NotAllowedError,
   NotFoundError,
   BadRequestError,
-  UnauthenticatedError,
-  UnauthorizedError,
+  AuthenticationError,
+  AuthorizationError,
   ConflictError,
   CustomError,
 };

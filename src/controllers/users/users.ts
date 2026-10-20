@@ -40,9 +40,18 @@ const getAllUsers = async (req: Request, res: Response, next: NextFunction) => {
     return next(new NotFoundError("No users found"));
   }
 
-  return res
-    .status(200)
-    .json(getResponse(limit, page, totalRecords?.count as number, data));
+  const dataCount = totalRecords?.count as number;
+
+  return res.status(200).json(
+    getResponse(data, {
+      totalRecords: dataCount,
+      limit,
+      currentPage: page,
+      totalPages: Math.ceil(dataCount / limit),
+      hasNextPage: page < Math.ceil(dataCount / limit),
+      hasPrevPage: page > 1,
+    }),
+  );
 };
 
 const addUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -99,7 +108,7 @@ const addUser = async (req: Request, res: Response, next: NextFunction) => {
     });
 
   return res
-    .status(200)
+    .status(201)
     .json(postResponse(newUser, "User successfully created"));
 };
 
