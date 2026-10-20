@@ -5,6 +5,7 @@ import type {
   NextFunction,
 } from "express";
 import { CustomError } from "../utils/customErrors.js";
+import { errorResponse } from "../utils/response.ts";
 
 const errorMiddleware: ErrorRequestHandler = (
   err,
@@ -13,11 +14,7 @@ const errorMiddleware: ErrorRequestHandler = (
   next: NextFunction,
 ) => {
   const statusCode = err instanceof CustomError ? err.statusCode : 500;
-
-  res.status(statusCode).json({
-    success: false,
-    message: err.message || "Internal Server Error",
-  });
+  errorResponse(res, statusCode, err.message || "Internal Server Error", err);
 };
 
 export default errorMiddleware;

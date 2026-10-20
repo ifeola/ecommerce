@@ -5,16 +5,16 @@ export interface QueryParams {
   offset: number;
 }
 
-type Meta = {
+interface Meta {
   totalRecords: number;
   currentPage: number;
   limit: number;
   totalPages: number;
   hasNextPage: boolean;
   hasPrevPage: boolean;
-};
+}
 
-type Single<T> = { success: true; message?: string; data: T };
+type Single<T> = { ok: true; message?: string; data: T };
 type Paginated<T> = Single<T[]> & { meta: Meta };
 
 const pagination = (req: Request): QueryParams => {
@@ -34,14 +34,14 @@ const getResponse = <T>(
   meta?: Meta,
 ): Single<T[]> | Paginated<T> => {
   return {
-    success: true,
+    ok: true,
     ...(meta && { meta }),
     data: items,
   };
 };
 
 const postResponse = <T>(data: T, message?: string): Single<T> => ({
-  success: true,
+  ok: true,
   ...(message && { message }),
   data,
 });
@@ -54,6 +54,6 @@ const errorResponse = (
 ) =>
   res
     .status(statusCode)
-    .json({ success: false, message, ...(errors && { errors }) });
+    .json({ ok: false, message, ...(errors && { errors }) });
 
 export { postResponse, pagination, getResponse, errorResponse };
